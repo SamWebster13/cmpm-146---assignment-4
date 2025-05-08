@@ -5,36 +5,69 @@ public class BehaviorBuilder
     public static BehaviorTree MakeTree(EnemyController agent)
     {
         BehaviorTree result = null;
+
         if (agent.monster == "warlock")
         {
-            result = new Sequence(new BehaviorTree[] {
-                                        new MoveToPlayer(agent.GetAction("attack").range),
-                                        new Attack(),
-                                        new PermaBuff(),
-                                        new Heal(),
-                                        new Buff()
-                                     });
+            result = new Selector(new BehaviorTree[]
+            {
+                new Sequence(new BehaviorTree[] {
+                    // new AbilityReadyQuery("heal"),
+                    new Heal()
+                }),
+                new Sequence(new BehaviorTree[] {
+                    // new AbilityReadyQuery("buff"),
+                    new StrengthFactorQuery(1.5f),
+                    new Buff()
+                }),
+                new Sequence(new BehaviorTree[] {
+                    // new ZigzagCirclePlayer(3f, 60f, 0.3f, 2f, 1.1f, 0.2f),
+                    new MoveToPlayer(agent.GetAction("attack").range),
+                    new Attack()
+                })
+            });
         }
         else if (agent.monster == "zombie")
         {
-            result = new Sequence(new BehaviorTree[] {
-                                       new MoveToPlayer(agent.GetAction("attack").range),
-                                       new Attack()
-                                     });
+            result = new Selector(new BehaviorTree[]
+            {
+                new Sequence(new BehaviorTree[] {
+                    new NearbyEnemiesQuery(1,5f),
+                    new Buff()
+                }),
+                new Sequence(new BehaviorTree[] {
+                    new NearbyEnemiesQuery(0,5f),
+                    new Heal()
+                }),
+                new Sequence(new BehaviorTree[] {
+                    new ZigzagMoveToPlayer(18f, 6f, 1f),
+                    new MoveToPlayer(agent.GetAction("attack").range),
+                    new Attack()
+                })
+            });
         }
-        else
+        else // default enemy type
         {
-            result = new Sequence(new BehaviorTree[] {
-                                       new MoveToPlayer(agent.GetAction("attack").range),
-                                       new Attack()
-                                     });
+            result = new Selector(new BehaviorTree[]
+            {
+                new Sequence(new BehaviorTree[] {
+                    // new AbilityReadyQuery("buff"),
+                    new NearbyEnemiesQuery(1,4f),
+                    new Buff()
+                }),
+                new Sequence(new BehaviorTree[] {
+                    new AbilityReadyQuery("buff"),
+                    new Buff(),
+                    new MoveToPlayer(agent.GetAction("attack").range),
+                    new Attack()
+                }),
+            });
         }
 
-        // do not change/remove: each node should be given a reference to the agent
-        foreach (var n in result.AllNodes())
+        foreach (var node in result.AllNodes())
         {
-            n.SetAgent(agent);
+            node.SetAgent(agent);
         }
+
         return result;
     }
 }
