@@ -4,7 +4,8 @@ public class AbilityReadyQuery : BehaviorTree
 
     public override Result Run()
     {
-        if (agent.GetAction(ability).Ready())
+        var action = agent.GetAction(ability);
+        if (action != null && action.Ready())
         {
             return Result.SUCCESS;
         }
