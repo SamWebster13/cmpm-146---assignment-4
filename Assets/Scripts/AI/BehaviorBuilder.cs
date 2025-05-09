@@ -41,7 +41,7 @@ public class BehaviorBuilder
                     new Heal()
                 }),
                 new Sequence(new BehaviorTree[] {
-                    new NearbyEnemiesQuery(5,400f),
+                    new NearbyEnemiesQuery(4,15f),
                     // new ZigzagMoveToPlayer(18f, 6f, 1f),
                     new MoveToPlayer(agent.GetAction("attack").range),
                     new Attack()
@@ -60,7 +60,8 @@ public class BehaviorBuilder
                 new Sequence(new BehaviorTree[] {
                     // new AbilityReadyQuery("buff"),
                     // new Buff(),
-                    new ZigzagMoveToPlayer(36f, 8f, 2f),
+                    new NearbyEnemiesQuery(1,4f),
+                    // new ZigzagMoveToPlayer(36f, 8f, 2f),
                     new MoveToPlayer(agent.GetAction("attack").range),
                     new Attack()
                 }),
